@@ -1,3 +1,4 @@
+const { ValidationError } = require("yup");
 const { AuthError } = require("../errors");
 
 const getErrorMessage = (code) => {
@@ -16,14 +17,14 @@ const getErrorMessage = (code) => {
 };
 
 module.exports = (err, req, res, next) => {
-
-  console.info(err)
+  console.info(err);
   if (err) {
     // if (process.env.NODE_ENV !== "production") {
     //   return res.send(err);
     // }
-
-    if (err instanceof AuthError) {
+    if (err instanceof ValidationError) {
+      return res.jsend.fail({ path: err.path, message: err.message });
+    } else if (err instanceof AuthError) {
       return res.jsend.error({
         code: err.code,
         message: getErrorMessage(err.code),
@@ -31,5 +32,5 @@ module.exports = (err, req, res, next) => {
     }
   }
 
-  return res.jsend.error({ code: 500, message: getErrorMessage(500) })
+  return res.jsend.error({ code: 500, message: getErrorMessage(500) });
 };

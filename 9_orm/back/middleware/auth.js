@@ -5,6 +5,7 @@ const { AuthError } = require("../errors");
 const Config = require("../config");
 
 const db = require("../db")("user");
+const models = require('../models')
 
 passport.use(
   new JwtStrategy(
@@ -15,10 +16,7 @@ passport.use(
     async (payload, done) => {
       try {
         //реализация логики получения юзера
-        const users = await db.readData();
-        const user = users.find(
-          (user) => Number(user.id) === Number(payload.id)
-        );
+        const user = await models.User.findByPk(payload.id)
         if (user) {
           done(null, user);
         } else {

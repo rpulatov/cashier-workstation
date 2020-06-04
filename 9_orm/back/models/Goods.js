@@ -1,29 +1,35 @@
-"use strict";
+const uuid = require("uuid").v4;
+
+("use strict");
 
 module.exports = (sequelize, DataTypes) => {
-  const Goods = sequelize.define(
-    "Goods",
-    {
-      uid: {
-        allowNull: false,
-        primaryKey: true,
-        type: DataTypes.UUID,
-      },
-      name: DataTypes.STRING,
-      price: DataTypes.DECIMAL(20, 2),
-      bonus: DataTypes.DECIMAL(20, 2),
-      place: DataTypes.STRING,
-      unit: DataTypes.STRING,
-      quantity: DataTypes.FLOAT,
-      arrivalDate: DataTypes.DATE,
-      store: DataTypes.STRING,
-      lot: DataTypes.STRING,
-      pku: DataTypes.BOOLEAN,
-      r: DataTypes.BOOLEAN,
-      shelfLife: DataTypes.DATE,
-      producer: DataTypes.STRING,
+  const Goods = sequelize.define("Goods", {
+    uid: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+    },
+    name: DataTypes.STRING,
+    price: DataTypes.DECIMAL(20, 2),
+    bonus: DataTypes.DECIMAL(20, 2),
+    place: DataTypes.STRING,
+    unit: DataTypes.STRING,
+    quantity: DataTypes.FLOAT,
+    arrivalDate: DataTypes.DATE,
+    store: DataTypes.STRING,
+    lot: DataTypes.STRING,
+    pku: DataTypes.BOOLEAN,
+    r: DataTypes.BOOLEAN,
+    shelfLife: DataTypes.DATE,
+    producer: DataTypes.STRING,
+  });
+
+  Goods.beforeCreate((goods, _) => {
+    if (!goods.uid) {
+      goods.uid = uuid();
     }
-  );
+    return goods;
+  });
 
   Goods.associate = function (models) {
     // associations can be defined here

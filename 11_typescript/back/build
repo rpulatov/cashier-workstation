@@ -1,0 +1,272 @@
+"use strict";
+require("dotenv").config();
+module.exports = {
+    development: {
+        url: process.env.DB_CONNECTION_STRING,
+        dialect: "postgres"
+    }
+};
+const CHECK_STATUS_OPENED = 0;
+const CHECK_STATUS_CLOSED = 1;
+module.exports = {
+    CHECK_STATUS_OPENED,
+    CHECK_STATUS_CLOSED,
+};
+const models = require("../models");
+const Constants = require("../constants");
+class CheckService {
+    constructor(user) {
+        this.user = user;
+    }
+    createCheck() {
+        return models.Check.create({
+            date: new Date(),
+            status: Constants.CHECK_STATUS_OPENED,
+            operator: this.user.username,
+            organizationName: "",
+            organizationAddres: "",
+            inn: "",
+            totalSum: 0,
+            userId: this.user.id,
+        });
+    }
+    getCheck(checkId) {
+        return models.Check.findByPk(checkId);
+    }
+    getCheckWithPositions(checkId) {
+        return models.Check.findAll({
+            where: {
+                id: checkId,
+            },
+            include: ["positions"],
+        });
+    }
+}
+module.exports = CheckService;
+// const async = require("../middleware/asyncRequest");
+const router = require("express").Router();
+// const models = require("../models");
+const CheckService = require("../core/CheckService");
+// const yup = require("yup");
+//создать новый чек
+router.post("/", (req, res, next) => {
+    return new CheckService(res.user).createCheck().then(res.jsend.success).catch(next);
+});
+router.get("/:checkId(\\d+)", (req, res, next) => {
+    return new CheckService(res.user)
+        .getCheckWithPositions(req.params.checkId)
+        .then(res.jsend.success)
+        .catch(next);
+});
+//добавить позицию
+//удалить позицию
+//закрыть чек
+module.exports = router;
+const models = require("../models");
+// const Constants = require("../constants");
+class GoodsService {
+    getGoods(goodsUid) {
+        return models.Goods.findByPk(goodsUid);
+    }
+}
+module.exports = GoodsService;
+const async = require("../middleware/asyncRequest");
+const router = require("express").Router();
+const models = require("../models");
+const Constants = require("../constants");
+const CheckService = require("../core/CheckService");
+const GoodsService = require("../core/GoodsService");
+const { ValidationError } = require("yup");
+//создать новую позицию чека
+router.post("/", async(async (req, res) => {
+    let { checkId, goodsUid } = req.body;
+    const checkService = new CheckService(req.user);
+    if (!checkId || !(await checkService.getCheck(checkId))) {
+        const check = await checkService.createCheck();
+        checkId = check.id;
+    }
+    console.info({ goodsUid });
+    const goods = await new GoodsService().getGoods(goodsUid);
+    if (!goods) {
+        throw new ValidationError("Такой товар не существует", null, "goodsUid");
+    }
+    const checkPosition = await models.CheckPosition.create({
+        checkId,
+        goodsUid: goods.uid,
+        name: goods.name,
+        sum: goods.price,
+        price: goods.price,
+        quantity: 1,
+    });
+    return res.jsend.success(checkPosition);
+}));
+//добавить позицию
+//удалить позицию
+//закрыть чек
+module.exports = router;
+// const async = require("../middleware/asyncRequest");
+const router = require("express").Router();
+const models = require("../models");
+const async = require("../middleware/asyncRequest");
+const yup = require("yup");
+const searchParamSchema = yup.object().shape({
+    barcode: yup.number(),
+    name: yup.string(),
+});
+router.get("/findAll", async(async (req, res) => {
+    const searchParam = await searchParamSchema.validate(req.query);
+    const data = await models.Goods.findAll({ where: searchParam });
+    return res.jsend.success(data);
+}));
+//добавить позицию
+//удалить позицию
+//закрыть чек
+module.exports = router;
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+const yup = require("yup");
+const router = require("express").Router();
+const User = require("../models").User;
+const async = require("../middleware/asyncRequest");
+router.get("/findAll", (req, res, next) => {
+    User.findAll({ attributes: { exclude: ["password"] } })
+        .then(res.jsend.success)
+        .catch(next);
+});
+const userSchema = yup.object().shape({
+    username: yup.string().required(),
+    password: yup.string().min(6).required(),
+    address: yup.string(),
+});
+//user create
+router.post("/", async(async (req, res) => {
+    const newUser = await userSchema.validate(req.body);
+    const salt = bcrypt.genSaltSync(saltRounds);
+    newUser.password = bcrypt.hashSync(req.newUser.password, salt);
+    const user = await User.create(newUser);
+    res.jsend.success(await User.findOne({
+        attributes: { exclude: ["password"] },
+        where: { id: user.id },
+    }));
+}));
+//user update
+// router.put("/{:id}", (req, res) => {});
+module.exports = router;
+const { AuthError } = require("../errors");
+const { ValidationError } = require("yup");
+const getErrorMessage = (code) => {
+    switch (code) {
+        case 401:
+            return "Неверные учётные данные";
+        case 403:
+            return "Доступ запрещен";
+        case 404:
+            return "Ресурс не найден";
+        case 500:
+            return "Сервис временно недоступен";
+        default:
+            return "Сервис временно недоступен";
+    }
+};
+module.exports = (err, req, res, next) => {
+    console.info(err);
+    if (err) {
+        // if (process.env.NODE_ENV !== "production") {
+        //   return res.send(err);
+        // }
+        if (err instanceof ValidationError) {
+            const { path, message } = err;
+            return res.jsend.fail({ path, message });
+        }
+        else if (err instanceof AuthError) {
+            return res.jsend.error({
+                code: err.code,
+                message: getErrorMessage(err.code),
+            });
+        }
+    }
+    return res.jsend.error({ code: 500, message: getErrorMessage(500) });
+};
+module.exports = (sequelize, DataTypes) => {
+    const Check = sequelize.define("Check", {
+        date: DataTypes.DATE,
+        status: DataTypes.INTEGER,
+        operator: DataTypes.STRING,
+        organizationName: DataTypes.STRING,
+        organizationAddres: DataTypes.STRING,
+        inn: DataTypes.STRING,
+        totalSum: DataTypes.DECIMAL(20, 2),
+    }, {});
+    Check.associate = function (models) {
+        models.Check.hasMany(models.CheckPosition, {
+            as: "positions",
+            foreignKey: "checkId",
+        });
+        models.Check.belongsTo(models.User, {
+            as: "user",
+            foreignKey: "userId",
+        });
+    };
+    return Check;
+};
+module.exports = (sequelize, DataTypes) => {
+    const CheckPosition = sequelize.define("CheckPosition", {
+        name: DataTypes.STRING,
+        sum: DataTypes.DECIMAL(20, 2),
+        price: DataTypes.DECIMAL(20, 2),
+        quantity: DataTypes.FLOAT,
+        checkId: {
+            type: DataTypes.INTEGER,
+        },
+        goodsUid: {
+            type: DataTypes.UUID,
+        },
+        createdAt: {
+            allowNull: false,
+            type: DataTypes.DATE,
+        },
+        updatedAt: {
+            allowNull: false,
+            type: DataTypes.DATE,
+        },
+    }, {});
+    CheckPosition.associate = function (models) {
+        models.CheckPosition.belongsTo(models.Check, {
+            as: "check",
+            foreignKey: "checkId",
+        });
+        models.CheckPosition.belongsTo(models.Goods, {
+            as: "goods",
+            foreignKey: "goodsUid",
+            targetKey: "uid",
+        });
+    };
+    return CheckPosition;
+};
+module.exports = (sequelize, DataTypes) => {
+    const Goods = sequelize.define("Goods", {
+        uid: {
+            allowNull: false,
+            primaryKey: true,
+            type: DataTypes.UUID,
+        },
+        name: DataTypes.STRING,
+        price: DataTypes.DECIMAL(20, 2),
+        bonus: DataTypes.DECIMAL(20, 2),
+        place: DataTypes.STRING,
+        unit: DataTypes.STRING,
+        quantity: DataTypes.FLOAT,
+        arrivalDate: DataTypes.DATE,
+        store: DataTypes.STRING,
+        lot: DataTypes.STRING,
+        pku: DataTypes.BOOLEAN,
+        r: DataTypes.BOOLEAN,
+        shelfLife: DataTypes.DATE,
+        producer: DataTypes.STRING,
+        barcode: DataTypes.NUMERIC,
+    });
+    Goods.associate = function (models) {
+        // associations can be defined here
+    };
+    return Goods;
+};

@@ -1,0 +1,22 @@
+:root {
+    --color-status-ok: green;
+    --color-attention: red;
+
+    --color-primary: #3D8FEC;
+
+    --color-selected: lightblue;
+
+    --color-gray-0: #999999;
+    --color-gray-1: #777777;
+    --color-gray-2: #333333;
+
+    --padding-base: 4px;
+    --padding-sm: calc(var(--padding-base)*2);
+    --padding-md: calc(var(--padding-base)*4);
+    --padding-lg: calc(var(--padding-base)*6);
+
+    --margin-base: 4px;
+    --margin-sm: calc(var(--margin-base)*2);
+    --margin-md: calc(var(--margin-base)*4);
+    --margin-lg: calc(var(--margin-base)*6);
+}

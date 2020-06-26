@@ -1,0 +1,30 @@
+.form {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    border-radius: 4px;
+    box-shadow: 4px 3px 10px 4px #33333359;
+    background-color: #fff;
+    padding: 20px 20px 0 20px;
+    text-align: left;
+    margin-top: -100px;
+    margin-left: -150px;
+}
+
+.item {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.item span {
+    display: block;
+}
+
+.item input {
+    width: 250px;
+}
+
+.buttonGroup { 
+    display: flex;
+    justify-content: space-between;
+}

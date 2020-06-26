@@ -1,0 +1,42 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+.form {
+    border-radius: 4px;
+    box-shadow: 4px 3px 10px 4px #33333359;
+    padding: 20px 20px 0 20px;
+}
+
+.item {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.item span {
+    display: block;
+}
+
+.item input {
+    width: 250px;
+}
+
+.button {
+    background-color: var(--color-primary);
+    border-radius: 20px;
+    width: 100%;
+    border: 0;
+    color: #fff;
+    padding: 5px;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.button:hover {
+    opacity: 0.8;
+}

@@ -1,0 +1,25 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  padding: var(--padding-md);
+}
+.headerLeftContainer {
+  padding: var(--padding-md);
+}
+.headerRightContainer {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+
+  padding: var(--padding-md);
+}
+
+.tableSection {
+  width: 100%;
+  overflow: auto;
+  flex: 1;
+
+  border: 1px solid var(--color-gray-0);
+}

@@ -1,0 +1,6 @@
+.footer {
+  display: flex;
+  padding-left: var(--padding-md);
+  padding-right: var(--padding-md);
+  padding-bottom: var(--padding-md);
+}

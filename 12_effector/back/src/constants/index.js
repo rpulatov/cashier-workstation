@@ -1,0 +1,7 @@
+const CHECK_STATUS_OPENED = 0;
+const CHECK_STATUS_CLOSED = 1;
+
+module.exports = {
+  CHECK_STATUS_OPENED,
+  CHECK_STATUS_CLOSED,
+};

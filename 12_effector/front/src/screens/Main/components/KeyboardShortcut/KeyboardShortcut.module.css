@@ -1,0 +1,21 @@
+.key {
+  position: relative;
+  border: 1px solid var(--color-gray-0);
+  margin-right: var(--margin-sm);
+}
+
+.value {
+  font-size: 0.8rem;
+  margin-top: -9px;
+  text-align: center;
+}
+
+.value::first-line {
+  background-color: #fff;
+}
+
+.label {
+  margin-left: var(--margin-base);
+  margin-right: var(--margin-base);
+  text-transform: uppercase;
+}

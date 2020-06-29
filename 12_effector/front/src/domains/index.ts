@@ -1,0 +1,1 @@
+export * as authDomain from './auth'

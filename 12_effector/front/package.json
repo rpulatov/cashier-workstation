@@ -9,6 +9,8 @@
     "@types/react-redux": "^7.1.9",
     "@types/react-router-dom": "^5.1.5",
     "barcoder": "^2.0.1",
+    "effector": "^20.17.1",
+    "effector-react": "^20.8.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-notifications": "^1.6.0",

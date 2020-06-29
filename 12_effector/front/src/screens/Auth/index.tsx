@@ -1,8 +1,7 @@
 import React from "react";
 
-import { connect } from "react-redux";
 
-import { loginAction } from "reduxStore/reducers/auth";
+import { loginFx } from "domains/auth";
 
 import styles from "./Auth.module.css";
 
@@ -24,7 +23,7 @@ class Auth extends React.Component<AuthProps, AuthState> {
   onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { login, password } = this.state;
-    this.props.loginAction(login, password);
+    loginFx({ login, password })
   };
 
   onChange = (name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,4 +70,4 @@ class Auth extends React.Component<AuthProps, AuthState> {
   }
 }
 
-export default connect(null, { loginAction })(Auth);
+export default Auth

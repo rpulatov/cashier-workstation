@@ -17,21 +17,23 @@ import SearchGoods from "screens/SearchGoods";
 import Auth from "screens/Auth";
 import NotFound from "screens/NotFound";
 
-import { useSelector } from "reduxStore";
+import { useStore } from "effector-react";
+
+import { $isAuth } from './domains/auth'
 
 function PrivateRoute(props: RouteProps) {
-  const token = useSelector((state) => state.auth.token);
-  return token ? <Route {...props} /> : <Redirect to="/login" />;
+  const isAuth = useStore($isAuth)
+  return isAuth ? <Route {...props} /> : <Redirect to="/login" />;
 }
 
 function App() {
   const history = useHistory();
-  const token = useSelector((state) => state.auth.token);
+  const isAuth = useStore($isAuth)
   React.useEffect(() => {
-    if (token) {
+    if (isAuth) {
       history.push("/");
     }
-  }, [token, history]);
+  }, [isAuth, history]);
 
   return (
     <Container>
